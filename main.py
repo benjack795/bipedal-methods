@@ -68,7 +68,6 @@ def master(algo, exp_str, exp_file, master_socket_path, log_dir):
 @click.option('--num_workers', type=int, default=0)
 def workers(algo, master_host, master_port, relay_socket_path, num_workers):
     # Start the relay
-    from subprocess import call
     master_redis_cfg = {'host': master_host, 'port': master_port}
     relay_redis_cfg = {'unix_socket_path': relay_socket_path}
     if os.fork() == 0:
@@ -82,7 +81,7 @@ def workers(algo, master_host, master_port, relay_socket_path, num_workers):
     for _ in range(num_workers):
         if os.fork() == 0:           
             os.environ["CUDA_VISIBLE_DEVICES"] = ""
-            print(os.environ.get('CUDA_VISIBLE_DEVICES'))
+            print(os.environ.get('CUDA_VISIBLE_DEVICES')) #compatability with system used
             algo.run_worker(master_redis_cfg, relay_redis_cfg, noise=noise)
             return
     os.wait()
