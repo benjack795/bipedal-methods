@@ -190,8 +190,8 @@ class MujocoPolicy(Policy):
                 tf.concat( [
                     tf.tile(np.arange(adim)[None, :, None], [tf.shape(aidx_na)[0], 1, 1]),
                     tf.expand_dims(aidx_na, -1)
-                ], 2)  # (n,a,2)
-            )  # (n,a)
+                ], 2)  # concat(n,a) -> concat(n,a,2) <-this is changed for tensorflow compatibility
+            ) 
         elif ac_bin_mode == 'continuous':
             a = U.dense(x, adim, 'out', U.normc_initializer(0.01))
         else:
@@ -276,9 +276,12 @@ class MujocoPolicy(Policy):
                 random_stream.seed(policy_seed)
 
         ob = env.reset()
+        #the m value is the multiplier that will be applied to the radial constraint
         env.env.m = 1
+        #the timeflipper value is the timestep at which the .25 cost multiplier will be applied
         timeflipper = 9999
         for _ in range(timestep_limit):
+            #here the flipper boolean is changed
             if(t > timeflipper):
                 env.env.flipper = True
             else:
