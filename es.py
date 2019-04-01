@@ -189,9 +189,10 @@ def run_master(master_redis_cfg, log_dir, exp):
     timesteps_so_far = 0
     tstart = time.time()
     master.declare_experiment(exp)
-    num_steps = 602
-
-    for r in range(num_steps+1):
+    
+    #added limiter to stop the master thread after a certain number of iterations for run efficiency
+    num_steps = 600
+    for r in range(num_steps):
         step_tstart = time.time()
         theta = policy.get_trainable_flat()
         assert theta.dtype == np.float32
@@ -326,7 +327,7 @@ def run_master(master_redis_cfg, log_dir, exp):
         # if config.snapshot_freq != 0 and curr_task_id % config.snapshot_freq == 0:
         if config.snapshot_freq != 0:
             import os.path as osp
-            filename = 'shots/snapshot_iter{:05d}_rew{}.h5'.format(
+            filename = 'shots/snapshot_iter{:05d}_rew{}.h5'.format(#added a folder for multiple snapshots for efficiency
                 curr_task_id,
                 np.nan if not eval_rets else int(np.mean(eval_rets))
             )
