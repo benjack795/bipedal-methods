@@ -37,14 +37,14 @@ def main(env_id, policy_file, record, stochastic, extra_kwargs):
         else:
             pi = MujocoPolicy.Load(policy_file, extra_kwargs=extra_kwargs)
             
-        while True:
-            if is_atari_policy:
-                rews, t, novelty_vector = pi.rollout(env, render=True, random_stream=np.random if stochastic else None)
-            print('return={:.4f} len={}'.format(rews.sum(), t))
+        #modified slightly as only atari policies are visualised in the default
+        #you can also add "pi.ac_noise_std=X" to visualise with action noise
+        rews, t, novelty_vector = pi.rollout(env, render=True, random_stream=np.random if stochastic else None)
+        print('return={:.4f} len={}'.format(rews.sum(), t))
 
-            if record:
-                env.close()
-                return
+        if record:
+            env.close()
+        return
 
 
 if __name__ == '__main__':
