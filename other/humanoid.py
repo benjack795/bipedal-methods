@@ -10,18 +10,12 @@ def mass_center(model):
 
 class HumanoidEnv(mujoco_env.MujocoEnv, utils.EzPickle):
     
+    #parameters for collecting data, delayed multiplier flipper, radial constraint check and multiplier and rough ground hfield
     collected_data = np.array([])
     m = 1
     flipper = False
     circlecheck = False
     hfield = False
-    turner = False
-    comeback = False
-    counters = np.zeros(17)
-    knees = False
-    hips = False
-    shoulders = False
-    footy = False
 
     def __init__(self):
         mujoco_env.MujocoEnv.__init__(self, 'humanoid.xml', 5)
@@ -29,14 +23,11 @@ class HumanoidEnv(mujoco_env.MujocoEnv, utils.EzPickle):
 
     def _get_obs(self):
         data = self.model.data
-        #does the network need the inertia, velocity and forces acting on the ball? no
-        #slicing the q-types should not affect the system as they describe the root joint
-        #gait appears good without
-        return np.concatenate([data.qpos.flat[2:24], #22 without, 29 with
-                               data.qvel.flat[:23], #23 without 29 with
+        return np.concatenate([data.qpos.flat[2:24], 
+                               data.qvel.flat[:23], 
                                data.cinert[:14].flat,
                                data.cvel[:14].flat,
-                               data.qfrc_actuator.flat[:23], #23 without 29 with
+                               data.qfrc_actuator.flat[:23], 
                                data.cfrc_ext[:14].flat])
 	
 
@@ -45,7 +36,7 @@ class HumanoidEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         pos_before = mass_center(self.model)
         self.do_simulation(a, self.frame_skip)
 	
-        #foot circle code
+        #radial constraint
         leftcircle = False
         # get the two feet
         leftfootpos = self.model.data.geom_xpos[11]
@@ -61,96 +52,34 @@ class HumanoidEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # is it outside the circle?
         if(comdist > (self.m*radius)):
             leftcircle = True
-        
-        #turning/coming back code
-        #start with reward being distance to x,y
-        distpos = [8, 8]
-        distpoint = sqrt( ((distpos[0] - cmass[0])**2) + ((distpos[1] - cmass[1])**2) )
-        distreward = -distpoint/2
-        #if position is near 8,8 flip a boolean to true
-        if(self.turner == True):
-            if(distpoint < 0.5):
-                self.comeback = True
-                self.turner = False
-        #as long as this boolean is true, reward is distance to 0,0
-        distorigin = sqrt( ((0 - cmass[0])**2) + ((0 - cmass[1])**2) )
-        distoriginreward = -distorigin/2
-        #check these work and run a test
-        
+               
         pos_after = mass_center(self.model)       
         alive_bonus = 5.0
         data = self.model.data
-
-        #joint bonuses code
-	#0.4s seem to be the default max, use these to apply bonuses
-       
-        #hipys
-        hipybonus = 0
-        if(np.absolute(data.actuator_force[5]) > 0.3):
-            hipybonus = hipybonus + 2
-        if(np.absolute(data.actuator_force[9]) > 0.3):
-            hipybonus = hipybonus + 2
-       
-        #knees
-        kneebonus = 0
-        if(np.absolute(data.actuator_force[6]) > 0.3):
-            kneebonus = kneebonus + 2
-        if(np.absolute(data.actuator_force[10]) > 0.3):
-            kneebonus = kneebonus + 2
-        
-        #shoulder joints
-        shoulbonus = 0
-        if(np.absolute(data.actuator_force[11]) > 0.3):
-            shoulbonus = shoulbonus + 1
-        if(np.absolute(data.actuator_force[12]) > 0.3):
-            shoulbonus = shoulbonus + 1
-        if(np.absolute(data.actuator_force[14]) > 0.3):
-            shoulbonus = shoulbonus + 1
-        if(np.absolute(data.actuator_force[15]) > 0.3):
-            shoulbonus = shoulbonus + 1
 
         lin_vel_cost = 0.25 * (pos_after - pos_before) / self.model.opt.timestep
         quad_ctrl_cost = 0.1 * np.square(data.ctrl).sum()
         quad_impact_cost = .5e-6 * np.square(data.cfrc_ext[:14]).sum()
         quad_impact_cost = min(quad_impact_cost, 10)
 
-        # typical values
-        # vel ~2 ctrl ~0.3 impact ~0.1-0.9 alive 5 dist would be -4 tops
+	#reward function code (if the flipper has been activated the multiplier is applied)
         reward = lin_vel_cost - (quad_ctrl_cost) - quad_impact_cost + alive_bonus
         if(self.flipper == True):
             reward = lin_vel_cost - (0.25*quad_ctrl_cost) - quad_impact_cost + alive_bonus
-        if(self.turner == True):
-            reward = lin_vel_cost - (quad_ctrl_cost) - quad_impact_cost + distreward + alive_bonus
-        if(self.comeback == True):
-            reward = lin_vel_cost - (quad_ctrl_cost) - quad_impact_cost + distoriginreward + alive_bonus
-        if(self.hips == True):
-             reward = lin_vel_cost - (quad_ctrl_cost) - quad_impact_cost + alive_bonus + hipybonus
-        if(self.knees == True):
-             reward = lin_vel_cost - (quad_ctrl_cost) - quad_impact_cost + alive_bonus + kneebonus
-        if(self.shoulders == True):
-             reward = lin_vel_cost - (quad_ctrl_cost) - quad_impact_cost + alive_bonus + shoulbonus
-        if(self.footy == True):
-             ballbonus = 0
-             ##if walker is 1 from ball, bonus is 4
-             ballpos = self.model.data.geom_xpos[18]
-             balldist = sqrt( ((ballpos[0] - cmass[0])**2) + ((ballpos[1] - cmass[1])**2) )
-             if(balldist < 1):
-                 ballbonus = ballbonus + 4
-             reward = lin_vel_cost - (quad_ctrl_cost) - quad_impact_cost + alive_bonus + ballbonus
+      
         qpos = self.model.data.qpos
         vertdone = bool((qpos[2] < 1.0) or (qpos[2] > 2.0))
+	#applying height correction if using a hfield (we cannot rely on the position of the ground)
         if (self.hfield == True):
             averagefoot = (leftfootpos[2] + rightfootpos[2])/2
             vertdone = bool((qpos[2]-averagefoot) < 1.0)
         done = vertdone
-        #done = False
-        #distance
+	
         distrecord = sqrt(cmass[0]**2 + cmass[1]**2)   
 
-        #print("foot {}".format(leftfootpos[2]))
-
         self.collected_data = np.append(self.collected_data,[lin_vel_cost, quad_ctrl_cost, data.actuator_force[0], data.actuator_force[1], data.actuator_force[2], data.actuator_force[3], data.actuator_force[4], data.actuator_force[5], data.actuator_force[6], data.actuator_force[7], data.actuator_force[8], data.actuator_force[9], data.actuator_force[10], data.actuator_force[11], data.actuator_force[12], data.actuator_force[13], data.actuator_force[14], data.actuator_force[15], data.actuator_force[16], distrecord], axis=0)
-        if(self.circlecheck == True):
+        #confirming the radial constraint
+	if(self.circlecheck == True):
             done = (leftcircle or vertdone) 
         return self._get_obs(), reward, done, dict(reward_linvel=lin_vel_cost, reward_quadctrl=-quad_ctrl_cost, reward_alive=alive_bonus, reward_impact=-quad_impact_cost)
 
