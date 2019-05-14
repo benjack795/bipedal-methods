@@ -1,5 +1,5 @@
 # bipedal-methods
-supplementary code for "Deep Neuroevolution of Humanoids that Walk Further and Faster with Robust Gaits"
+supplementary code for "Neuroevolution of Humanoids that Walk Further and Faster with Robust Gaits"
 
 The folder "deep-neuroevolution" contains a modified version of the code featured on the UberAI github for deep-neuroevolved humanoid walking. 
 
