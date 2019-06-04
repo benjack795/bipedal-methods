@@ -41,7 +41,8 @@ class HumanoidEnv(mujoco_env.MujocoEnv, utils.EzPickle):
         # get the two feet
         leftfootpos = self.model.data.geom_xpos[11]
         rightfootpos = self.model.data.geom_xpos[8]
-        # get the com
+        # *****THIS IS NOT ACCURATE IN THE PAPER (many apologies) 
+        # THIS IS NOT THE CENTRE OF MASS BUT THE LOCATION OF THE ROOT JOINT (a com function is above)
         cmass = self.model.data.qpos[:2]
         # work out midpoint between feet 
         midpoint = [(leftfootpos[0] + rightfootpos[0])/2, (leftfootpos[1] + rightfootpos[1])/2]
