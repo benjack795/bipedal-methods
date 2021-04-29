@@ -1,7 +1,7 @@
 # bipedal-methods
-supplementary code for "Neuroevolution of Humanoids that Walk Further and Faster with Robust Gaits"
+supplementary code for Chapter 5 of Neuroevolution of Bipedal Locomotion: algorithmic, balance penalty and morphological improvements for improved robustness and performance
 
-The folder "deep-neuroevolution" contains a modified version of the code featured on the UberAI github for deep-neuroevolved humanoid walking. 
+The folder "deep-neuroevolution" contains a modified version of the code featured in Chapter 5 of Neuroevolution of Bipedal Locomotion: algorithmic, balance penalty and morphological improvements for improved robustness and performance
 
 Also included are modified files from the OpenAI gym github used alongside ("other" folder). These include xml files (add to gym/envs/mujoco/assets) for the default and rough ground environments, as well as a modified humanoid.py (add to gym/envs/mujoco) for the changes to the humanoid environment to enable the methods employed. By replacing appropriately in your deep-neuroevolution installation and your openai-gym installation you should be able to reproduce this work. (If not contact me, b.jackson@keele.ac.uk)
 
