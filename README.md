@@ -1,5 +1,5 @@
 # bipedal-methods
-supplementary code for Chapter 5 of Neuroevolution of Bipedal Locomotion: algorithmic, balance penalty and morphological improvements for improved robustness and performance
+Supplementary code for Chapter 5 of Neuroevolution of Bipedal Locomotion: algorithmic, balance penalty and morphological improvements for improved robustness and performance
 
 The folder "deep-neuroevolution" contains a modified version of the code featured in Chapter 5 of Neuroevolution of Bipedal Locomotion: algorithmic, balance penalty and morphological improvements for improved robustness and performance
 
