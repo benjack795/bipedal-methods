@@ -21,24 +21,24 @@ CHANGELIST
 ==========
 deep-neuroevolution/es_distributed/ es.py 
 
-  -added a limiter to keep to 600 iterations
+  -   added a limiter to keep to 600 iterations
   
-  -set snapshots to be added to folder
+  -   set snapshots to be added to folder
   
 deep-neuroevolution/es_distributed/ policies.py
 
-  -included settings parameters to adjust the two main modifications
+  -   included settings parameters to adjust the two main modifications
   
 deep-neuroevolution/scripts/ viz.py
 
-  -signposted action noise adjustment settings 
+  -   signposted action noise adjustment settings 
   
 others/ humanoid.py
 
-	-the bulk of the code for the control cost multiplier and radial fall constraint is located here
+  -   the bulk of the code for the control cost multiplier and radial fall constraint is located here
 	
 others/ humanoid.xml
 
-	-the floor texture and shadows are adjusted for clarity of visualisatoin
+  -   the floor texture and shadows are adjusted for clarity of visualisatoin
 
 (Any issues contact me at benjack795@gmail.com)
