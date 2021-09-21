@@ -23,7 +23,7 @@ deep-neuroevolution/es_distributed/ es.py
 
   -   added a limiter to keep to 600 iterations
   
-  -   set snapshots to be added to folder
+  -   set snapshots to be added to a folder
   
 deep-neuroevolution/es_distributed/ policies.py
 
@@ -39,6 +39,6 @@ others/ humanoid.py
 	
 others/ humanoid.xml
 
-  -   the floor texture and shadows are adjusted for clarity of visualisatoin
+  -   the floor texture and shadows are adjusted for clarity of visualisation
 
 (Any issues contact me at benjack795@gmail.com)
