@@ -33,6 +33,8 @@ deep-neuroevolution/scripts/ viz.py
 
   -   signposted action noise adjustment settings 
   
+  -   added csv writer to produce results used in paper
+  
 others/ humanoid.py
 
   -   the bulk of the code for the control cost multiplier and radial fall constraint is located here
