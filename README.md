@@ -33,7 +33,7 @@ deep-neuroevolution/scripts/ viz.py
 
   -   signposted action noise adjustment settings 
   
-  -   added csv writer to produce results used in paper
+  -   added csv writer to produce results files used in paper
   
 others/ humanoid.py
 
