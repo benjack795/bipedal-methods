@@ -60,7 +60,7 @@ def main(env_id, policy_file, record, stochastic, extra_kwargs):
             steps = len(data_array)/20 #dividing by number of values in each substep of array 
             final_test = data_array
             for i in range(int(steps)):
-                r = final_test[(i*20):((i+1)*20)] #speed, control values and distance travelled
+                r = final_test[(i*20):((i+1)*20)] #speed, control cost, control values and distance travelled
                 writer.writerow({'speed': r[0], 'cost': r[1], 'c1': r[2], 'c2': r[3], 'c3': r[4],'c4': r[5], 'c5': r[6],'c6': r[7],'c7': r[8],'c8': r[9],'c9': r[10],'c10': r[11],'c11': r[12],'c12': r[13],'c13': r[14],'c14': r[15],'c15': r[16],'c16': r[17],'c17': r[18], 'dist': r[19]})
  
 #####################################   
